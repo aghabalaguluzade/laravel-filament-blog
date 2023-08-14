@@ -35,14 +35,14 @@ class CategoryResource extends Resource
                 Section::make()
                 ->columns([5])
                 ->schema([
-                    TextInput::make('name')->required()
-                ->live()
-                ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
-                    if (($get('slug') ?? '') !== Str::slug($old)) {
-                        return;
-                    }
-                    $set('slug', Str::slug($state));
-                }),
+                TextInput::make('name')->required()
+                    ->live()
+                    ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
+                        if (($get('slug') ?? '') !== Str::slug($old)) {
+                            return;
+                        }
+                        $set('slug', Str::slug($state));
+                    }),
                 TextInput::make('slug')
                 ])
             ]);
