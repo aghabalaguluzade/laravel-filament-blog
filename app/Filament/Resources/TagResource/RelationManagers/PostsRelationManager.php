@@ -1,25 +1,19 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\TagResource\RelationManagers;
 
-use App\Filament\Resources\PostResource\Pages;
-use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Category;
-use App\Models\Post;
 use Filament\Forms;
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -30,23 +24,19 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
-class PostResource extends Resource
+class PostsRelationManager extends RelationManager
 {
-    protected static ?string $model = Post::class;
+    protected static string $relationship = 'posts';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $recordTitleAttribute = 'title';
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
                 Section::make([
                     Select::make('category_id')
                     ->label('Category')
-                    ->options(Category::all()->pluck('name', 'id'))
+                    // ->options(Category::all()->pluck('name', 'id'))
                     ->searchable(),
                     TextInput::make('title')->required()
                     ->live(debounce: 500)
@@ -69,45 +59,33 @@ class PostResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('title')
             ->columns([
                 ImageColumn::make('thumbail'),
                 TextColumn::make('title')
                 ->limit(50)
                 ->searchable(),
                 TextColumn::make('slug')
-                ->limit(50),
+                ->limit(50)
+                ->searchable(),
                 IconColumn::make('is_published')
                 ->boolean()
-            ])->defaultSort('id', 'desc')
+            ])
             ->filters([
-                Filter::make('Published')
-                ->query(fn (Builder $query) => $query->where('is_published', true)),
-                Filter::make('Unpublished')
-                ->query(fn (Builder $query) => $query->where('is_published', false)),
-                SelectFilter::make('category')
-                    ->relationship('category', 'name'),
-                Filter::make('created_at')
-                ->form([
-                    DatePicker::make('created_from'),
-                    DatePicker::make('created_until'),
-                ])
-                ->query(function (Builder $query, array $data): Builder {
-                    return $query
-                        ->when(
-                            $data['created_from'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                        )
-                        ->when(
-                            $data['created_until'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                        );
-                })
+                Filter::make('is_featured')
+                ->query(fn (Builder $query) => $query->where('is_featured', true)),
+                SelectFilter::make('status')
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+                Tables\Actions\AttachAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -118,20 +96,4 @@ class PostResource extends Resource
                 Tables\Actions\CreateAction::make(),
             ]);
     }
-    
-    public static function getRelations(): array
-    {
-        return [
-            RelationManagers\TagsRelationManager::class,
-        ];
-    }
-    
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListPosts::route('/'),
-            'create' => Pages\CreatePost::route('/create'),
-            'edit' => Pages\EditPost::route('/{record}/edit'),
-        ];
-    }    
 }

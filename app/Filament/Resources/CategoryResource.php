@@ -27,6 +27,7 @@ class CategoryResource extends Resource
     protected static ?string $model = Category::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
@@ -60,11 +61,6 @@ class CategoryResource extends Resource
                 Filter::make('is_featured')
                 ->query(fn (Builder $query) => $query->where('is_featured', true)),
                 SelectFilter::make('status')
-                    ->options([
-                        'draft' => 'Draft',
-                        'reviewing' => 'Reviewing',
-                        'published' => 'Published',
-                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -82,7 +78,7 @@ class CategoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\PostsRelationManager::class,
         ];
     }
     
