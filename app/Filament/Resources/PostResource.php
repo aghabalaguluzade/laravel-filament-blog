@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Post;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -20,6 +21,7 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -45,7 +47,7 @@ class PostResource extends Resource
                     ->options(Category::all()->pluck('name', 'id'))
                     ->searchable(),
                     TextInput::make('title')->required()
-                    ->live()
+                    ->live(debounce: 500)
                     ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
                         if (($get('slug') ?? '') !== Str::slug($old)) {
                             return;
@@ -54,8 +56,12 @@ class PostResource extends Resource
                     }),
                     TextInput::make('slug'),
                     RichEditor::make('content'),
-                    SpatieMediaLibraryFileUpload::make('thumbail')
-                    ->collection('posts'),
+                    FileUpload::make('thumbail')
+                    ->required()
+                    ->image()
+                    ->maxSize(4096)
+                    ->hint( __('Max. 4MB'))
+                    ->directory('posts'),
                     Toggle::make('is_published'),
                 ])
             ]);
@@ -65,10 +71,7 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                ->sortable(),
-                SpatieMediaLibraryImageColumn::make('thumbail')
-                ->collection('posts'),
+                ImageColumn::make('thumbail'),
                 TextColumn::make('title')
                 ->limit(50)
                 ->searchable(),

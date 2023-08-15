@@ -36,7 +36,7 @@ class CategoryResource extends Resource
                 ->columns([5])
                 ->schema([
                 TextInput::make('name')->required()
-                    ->live()
+                    ->live(debounce: 500)
                     ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
                         if (($get('slug') ?? '') !== Str::slug($old)) {
                             return;

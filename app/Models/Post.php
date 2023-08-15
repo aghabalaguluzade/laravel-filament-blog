@@ -4,14 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Post extends Model implements HasMedia
+class Post extends Model
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory;
     
-    protected $fillable = ['category_id', 'title', 'content', 'slug', 'is_published'];
+    protected $fillable = ['category_id', 'thumbail', 'title', 'content', 'slug', 'is_published'];
 
     public function category() {
         return $this->belongsToMany(Category::class);
