@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Widgets\StatsOverviewWidget;
 
 class PostResource extends Resource
 {
@@ -123,6 +124,13 @@ class PostResource extends Resource
     {
         return [
             RelationManagers\TagsRelationManager::class,
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            StatsOverviewWidget::class
         ];
     }
     
