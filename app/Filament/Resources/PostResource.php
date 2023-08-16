@@ -38,6 +38,7 @@ class PostResource extends Resource
     protected static ?string $model = Post::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Blog';
     protected static ?string $recordTitleAttribute = 'title';
 
     public static function form(Form $form): Form
@@ -60,7 +61,6 @@ class PostResource extends Resource
                     TextInput::make('slug'),
                     RichEditor::make('content'),
                     FileUpload::make('thumbail')
-                    ->required()
                     ->image()
                     ->maxSize(4096)
                     ->hint( __('Max. 4MB'))

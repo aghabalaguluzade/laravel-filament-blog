@@ -2,45 +2,37 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TagResource\Pages;
-use App\Filament\Resources\TagResource\RelationManagers;
-use App\Models\Tag;
+use App\Filament\Resources\PermissionResource\Pages;
+use App\Filament\Resources\PermissionResource\RelationManagers;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
+use Spatie\Permission\Models\Permission;
 
-class TagResource extends Resource
+class PermissionResource extends Resource
 {
-    protected static ?string $model = Tag::class;
+    protected static ?string $model = Permission::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Blog';
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $navigationGroup = 'User Management';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Section::make([
-                    TextInput::make('name')->required()
-                    ->live(debounce: 500)
-                    ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
-                        if (($get('slug') ?? '') !== Str::slug($old)) {
-                            return;
-                        }
-                        $set('slug', Str::slug($state));
-                    }),
-                    TextInput::make('slug')
+                    TextInput::make('name')
+                        ->minLength(2)
+                        ->maxLength(255)
+                        ->required()
+                        ->unique()
                 ])
             ]);
     }
@@ -49,9 +41,10 @@ class TagResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('slug'),
-            ])
+                TextColumn::make('name')
+                ->sortable()
+                ->searchable(),
+            ])->defaultSort('id', 'desc')
             ->filters([
                 //
             ])
@@ -71,16 +64,16 @@ class TagResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\PostsRelationManager::class,
+            //
         ];
     }
     
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTags::route('/'),
-            'create' => Pages\CreateTag::route('/create'),
-            'edit' => Pages\EditTag::route('/{record}/edit'),
+            'index' => Pages\ListPermissions::route('/'),
+            'create' => Pages\CreatePermission::route('/create'),
+            'edit' => Pages\EditPermission::route('/{record}/edit'),
         ];
     }    
 }
