@@ -14,4 +14,9 @@ class CreatePermission extends CreateRecord
     {
         return $this->getResource()::getUrl('create');
     }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return 'Permission created';
+    }
 }
