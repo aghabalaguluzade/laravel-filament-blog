@@ -15,11 +15,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return str_ends_with($this->email, '@gmail.com') && $this->hasVerifiedEmail();
-    }
-
     /**
      * The attributes that are mass assignable.
      *
@@ -50,4 +45,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // return str_ends_with($this->email, '@gmail.com') && $this->hasVerifiedEmail();
+        return str_ends_with($this->email, '@gass.com');
+    }
 }
