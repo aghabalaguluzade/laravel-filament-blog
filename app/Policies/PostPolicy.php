@@ -13,7 +13,7 @@ class PostPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['Admin', 'Writer', 'Moderator']);
+        return $user->hasPermissionTo('View Posts') ? true : false;
     }
 
     /**
@@ -29,7 +29,7 @@ class PostPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['Admin', 'Writer', 'Moderator']);
+        return $user->hasPermissionTo('Create Posts') ? true : false;
     }
 
     /**
@@ -37,7 +37,7 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        return $user->hasRole(['Admin', 'Writer', 'Moderator']);
+        return $user->hasPermissionTo('Edit Posts') ? true : false;
     }
 
     /**
@@ -45,7 +45,7 @@ class PostPolicy
      */
     public function delete(User $user, Post $post): bool
     {
-        return $user->hasRole(['Admin', 'Writer', 'Moderator']);
+        return $user->hasPermissionTo('Delete Posts') ? true : false;
     }
 
     /**
